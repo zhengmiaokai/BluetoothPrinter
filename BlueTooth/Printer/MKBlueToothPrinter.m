@@ -8,6 +8,10 @@
 #import "MKBlueToothPrinter.h"
 #import "MKBluetoothManager.h"
 
+/// 蓝牙打印机通用服务
+#define kServiceUUID1         [CBUUID UUIDWithString:@"49535343-FE7D-4AE5-8FA9-9FAFD205E455"]
+#define kServiceUUID2         [CBUUID UUIDWithString:@"E7810A71-73AE-499D-8C15-FAA9AEF0C3F2"]
+
 @interface MKBlueToothPrinter () <MKBluetoothManagerDelegate> {
     BOOL _isManualDisconnect; // 手动断开
 }
@@ -88,7 +92,7 @@
             
             /// 已扫描列表未包含记录的设备，重新扫描
             if (!isExist) {
-                [[MKBluetoothManager sharedInstance] scanForPeripheralsWithServices:nil stopScanAfterConnected:NO];
+                [[MKBluetoothManager sharedInstance] scanForPeripheralsWithServices:@[kServiceUUID1, kServiceUUID2] /* nil */ stopScanAfterConnected:NO];
             }
         }
     }
@@ -98,7 +102,7 @@
 #pragma mark - BluetoothMessageDelegate -
 - (void)centralManagerDidUpdateState:(BOOL)isAvailable message:(NSString *)message getStatus:(CBManagerState)state {
     if (isAvailable) {
-        [[MKBluetoothManager sharedInstance] scanForPeripheralsWithServices:nil stopScanAfterConnected:NO];
+        [[MKBluetoothManager sharedInstance] scanForPeripheralsWithServices:@[kServiceUUID1, kServiceUUID2] /* nil */ stopScanAfterConnected:NO];
     }
 }
 
