@@ -6,11 +6,21 @@
 //
 
 #import <Foundation/Foundation.h>
-#import "MKBTStateModel.h"
+#import <CoreBluetooth/CoreBluetooth.h>
 
-NS_ASSUME_NONNULL_BEGIN
+typedef NS_ENUM(NSInteger, MKBTConnectErrorType) {
+    MKBTConnectErrorTypeNone        = 0,  /// 非异常
+    MKBTConnectErrorTypeNoConfig    = 1,  /// 未配置蓝牙
+    MKBTConnectErrorTypeTimeOut     = 2,  /// 连接超时
+};
+
+typedef void(^MKScanCallBack)(CBPeripheral* peripheral, NSArray* peripherals);
+typedef void(^MKConnectCallBack)(CBPeripheral* peripheral, MKBTConnectErrorType connectErrorType);
 
 @interface MKBlueToothPrinter : NSObject
+
+/// 连接超时设置（未找到设备，连接异常），默认为 8s
+@property (nonatomic, assign)  NSInteger timeout;
 
 /// 非主动断开时，是否自动重连，默认为 NO
 @property (nonatomic, assign) BOOL isReConnect;
@@ -18,13 +28,15 @@ NS_ASSUME_NONNULL_BEGIN
 /// 当匹配到之前连接的设备后，是否自动连接，默认为 YES
 @property (nonatomic, assign) BOOL isAutoConnect;
 
-/// 扫描到外围设备
-@property (nonatomic, copy) void(^scanCallBack)(CBPeripheral* peripheral, NSArray* peripherals);
-
-/// 设备连接状态变更
-@property (nonatomic, copy) void(^connectCallBack)(MKBTStateModel* stateItem);
-
 + (MKBlueToothPrinter *)sharedInstance;
+
+/// 扫描到外围设备回调
+- (void)addScanCallBack:(MKScanCallBack)scanCallBack forKey:(NSString *)key;
+- (void)removeScanCallBackForKey:(NSString *)key;
+
+/// 设备连接状态变更回调
+- (void)addConnectCallBack:(MKConnectCallBack)connectCallBack forKey:(NSString *)key;
+- (void)removeConnectCallBackForKey:(NSString *)key;
 
 /// 初始化蓝牙中心配置
 - (void)initializeBlueTooth;
@@ -33,8 +45,6 @@ NS_ASSUME_NONNULL_BEGIN
 - (void)connectPeripheral:(CBPeripheral*)periphera;
 
 /// 打印订单小票
-- (void)printOrderWithData:(NSData *)data printCallBack:(void(^)(BOOL success))printCallBack;
+- (void)printOrderWithData:(NSData *)data printCallBack:(void(^)(BOOL success, MKBTConnectErrorType connectErrorType))printCallBack;
 
 @end
-
-NS_ASSUME_NONNULL_END
