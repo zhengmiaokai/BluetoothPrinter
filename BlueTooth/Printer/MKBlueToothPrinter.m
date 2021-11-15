@@ -108,8 +108,7 @@
     NSString* UUIDString = [[NSUserDefaults standardUserDefaults] stringForKey:kBTPeripheralIdentify];
     if (UUIDString.length == 0) {
         NSLog(@"未配置打印机");
-        
-        /// 连接超时回调
+        /// 未配置蓝牙回调
         [[self.connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
             connectCallBack(nil, MKBTConnectErrorTypeNoConfig);
         }];
