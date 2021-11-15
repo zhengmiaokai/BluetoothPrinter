@@ -13,7 +13,7 @@
 
 @property (nonatomic, strong) UITableView* tableView;
 
-@property (nonatomic, strong) MKBTStateModel* stateModel;
+@property (nonatomic, strong) CBPeripheral* peripheral;
 @property (nonatomic, copy) NSArray* peripherals;
 
 @end
@@ -26,20 +26,25 @@
     [self.view addSubview:self.tableView];
     [self.view addSubview:[self button]];
     
+    NSString* key = [NSString stringWithFormat:@"to%@",NSStringFromClass(self.class)];
     __weak typeof(self) weakSelf = self;
-    [[MKBlueToothPrinter sharedInstance] setScanCallBack:^(CBPeripheral * _Nonnull peripheral, NSArray* peripherals) {
+    [[MKBlueToothPrinter sharedInstance] addScanCallBack:^(CBPeripheral *peripheral, NSArray *peripherals) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         strongSelf.peripherals = peripherals;
         [strongSelf.tableView reloadData];
-    }];
+    } forKey:key];
     
-    [[MKBlueToothPrinter sharedInstance] setConnectCallBack:^(MKBTStateModel * _Nonnull stateItem) {
-        __strong typeof(weakSelf) strongSelf = weakSelf;
-        strongSelf.stateModel = stateItem;
-        [strongSelf.tableView reloadData];
-    }];
-    
-    [[MKBlueToothPrinter sharedInstance] initializeBlueTooth];
+    [[MKBlueToothPrinter sharedInstance] addConnectCallBack:^(CBPeripheral *peripheral, MKBTConnectErrorType connectErrorType) {
+        if (connectErrorType == MKBTConnectErrorTypeNone) {
+            __strong typeof(weakSelf) strongSelf = weakSelf;
+            strongSelf.peripheral = peripheral;
+            [strongSelf.tableView reloadData];
+        } else if (connectErrorType == MKBTConnectErrorTypeTimeOut) {
+            NSLog(@"蓝牙链接超时");
+        } else if (connectErrorType == MKBTConnectErrorTypeNoConfig) {
+            NSLog(@"蓝牙未配置");
+        }
+    } forKey:key];
 }
 
 - (UITableView *)tableView {
@@ -61,7 +66,7 @@
 
 - (void)print:(UIButton *)btn {
     HLPrinter* printer = [self getPrinter];
-    [[MKBlueToothPrinter sharedInstance] printOrderWithData:[printer getFinalData] printCallBack:^(BOOL success) {
+    [[MKBlueToothPrinter sharedInstance] printOrderWithData:[printer getFinalData] printCallBack:^(BOOL success, MKBTConnectErrorType connectErrorType) {
         if (success) {
             NSLog(@"订单已经打印！！！");
         }
@@ -132,18 +137,19 @@
     
     cell.textLabel.text = cbPeripheral.name;
     
-    if ([self.stateModel.peripheral isEqual:cbPeripheral]) {
-        if (self.stateModel.connectState == BTConnectStateConnected) {
+    if ([self.peripheral isEqual:cbPeripheral]) {
+        if (self.peripheral.state == CBPeripheralStateConnected) {
             cell.detailTextLabel.text = @"已连接";
-        } else if (self.stateModel.connectState == BTConnectStateConnecting) {
+        } else if (self.peripheral.state == CBPeripheralStateConnecting) {
             cell.detailTextLabel.text = @"链接中";
+        } else if (self.peripheral.state == CBPeripheralStateDisconnecting) {
+            cell.detailTextLabel.text = @"断开中";
         } else {
             cell.detailTextLabel.text = nil;
         }
     } else {
         cell.detailTextLabel.text = nil;
     }
-    
     return cell;
 }
 
