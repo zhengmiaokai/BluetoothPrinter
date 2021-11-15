@@ -141,14 +141,22 @@
 - (void)writeValue:(NSData *)data forCharacteristic:(CBCharacteristic *)characteristic type:(CBCharacteristicWriteType)type {
     if (!characteristic) {
         NSLog(@"characteristic can not be nil !!!");
+        if ([self isConnected]) {
+            [_cbPeripheral discoverServices:_serviceUUIDs];
+        }
+        
+        if (_delegate && [_delegate respondsToSelector:@selector(writeResult:characteristic:)]) {
+            [_delegate writeResult:NO descriptor:nil];
+        }
+    } else {
+        /* iOS9之后提供了查询蓝牙写入最大长度，经过真机测试(iphone5s/iphone7)，data长度超过maxLength也可以正常写入
+        if ([_cbPeripheral respondsToSelector:@selector(maximumWriteValueLengthForType:)]) {
+            NSInteger maxLength = [_cbPeripheral maximumWriteValueLengthForType:CBCharacteristicWriteWithResponse];
+        }
+         */
+        
+        [self.cbPeripheral writeValue:data forCharacteristic:characteristic type:type];
     }
-    /* iOS9之后提供了查询蓝牙写入最大长度，经过真机测试(iphone5s/iphone7)，data长度超过maxLength也可以正常写入
-    if ([_cbPeripheral respondsToSelector:@selector(maximumWriteValueLengthForType:)]) {
-        NSInteger maxLength = [_cbPeripheral maximumWriteValueLengthForType:CBCharacteristicWriteWithResponse];
-    }
-     */
-    
-    [self.cbPeripheral writeValue:data forCharacteristic:characteristic type:type];
 }
 
 - (void)setNotifyValue:(BOOL)enabled forCharacteristic:(CBCharacteristic *)characteristic {
