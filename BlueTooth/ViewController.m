@@ -78,46 +78,42 @@
 - (HLPrinter *)getPrinter {
     HLPrinter *printer = [[HLPrinter alloc] init];
     
-    NSString *title = @"测试电商";
-    NSString *str1 = @"测试电商服务中心(销售单)";
-    [printer appendText:title alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleBig];
-    [printer appendText:str1 alignment:HLTextAlignmentCenter];
-    
-    /* 暂时屏蔽，以免消耗太多打印纸
-    // 条形码
-    [printer appendBarCodeWithInfo:@"123456789012"];
+    [printer appendText:@"#27商户平台" alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleMiddle];
+    [printer appendNewLine];
+    [printer appendText:@"李记三及第-宝体" alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleSmalle];
     [printer appendSeperatorLine];
     
-    [printer appendTitle:@"时间:" value:@"2016-04-27 10:01:50" valueOffset:150];
-    [printer appendTitle:@"订单:" value:@"4000020160427100150" valueOffset:150];
-    [printer appendText:@"地址:深圳市南山区学府路东深大店" alignment:HLTextAlignmentLeft];
-    
-    [printer appendSeperatorLine];
-    [printer appendLeftText:@"商品" middleText:@"数量" rightText:@"单价" isTitle:YES];
-    
+    [printer appendText:@"期望送达时间：立即配送" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleSmalle];
+    [printer appendText:@"下单时间：2021-11-15 11:27:27" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleSmalle];
     [printer appendSeperatorLine];
     
-    CGFloat total = 37.0;
-    NSString *totalStr = [NSString stringWithFormat:@"%.2f", total];
-    [printer appendTitle:@"总计:" value:totalStr];
-    [printer appendTitle:@"实收:" value:@"100.00"];
-    NSString *leftStr = [NSString stringWithFormat:@"%.2f", 100.00 - total];
-    [printer appendTitle:@"找零:" value:leftStr];
-    
-    [printer appendSeperatorLine];
-    // 二维码
-    [printer appendText:@"位图方式打印二维码" alignment:HLTextAlignmentCenter];
-    [printer appendQRCodeWithInfo:@"www.baidu.com"];
+    [printer appendText:@"备注：少麻少辣，谢谢！！！" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
     [printer appendSeperatorLine];
     
-    [printer appendText:@"指令方式打印二维码" alignment:HLTextAlignmentCenter];
-    [printer appendQRCodeWithInfo:@"www.baidu.com" size:12];
+    [printer appendLeftText:@"商品" middleText:@"数量" rightText:@"价格" isTitle:YES];
+    [printer appendSeperatorLine];
+    [printer appendLeftText:@"三及第汤河粉" middleText:@"1" rightText:@"￥13" isTitle:YES];
     [printer appendSeperatorLine];
     
-    // 图片
-    [printer appendImage:[UIImage imageNamed:@"ico180"] alignment:HLTextAlignmentCenter maxWidth:300];
-    [printer appendFooter:nil];
-     */
+    [printer appendTitle:@"打包费：" value:@"￥1"];
+    [printer appendTitle:@"配送费：" value:@"￥2"];
+    [printer appendTitle:@"优惠券：" value:@"-￥3"];
+    [printer appendSeperatorLine];
+    
+    [printer appendText:@"用户实付：￥13" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
+    [printer appendSeperatorLine];
+    
+    [printer appendText:@"广东华南理工" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
+    [printer appendText:@"南苑10栋   403" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
+    [printer appendText:@"郑先生" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
+    [printer appendText:@"158******27" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
+    [printer appendNewLine];
+    
+    [printer appendQRCodeWithInfo:@"MD1232423434"];
+    [printer appendNewLine];
+    
+    [printer appendNewLine];
+    [printer appendNewLine];
     
     return printer;
 }

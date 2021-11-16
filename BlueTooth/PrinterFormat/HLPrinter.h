@@ -163,6 +163,11 @@ typedef NS_ENUM(NSInteger, HLFontSize) {
 - (void)appendQRCodeWithInfo:(NSString *)info centerImage:(UIImage *)centerImage alignment:(HLTextAlignment)alignment maxWidth:(CGFloat )maxWidth;
 
 /**
+ *  换行
+ */
+- (void)appendNewLine;
+
+/**
  *  添加一条分割线，like this:---------------------------
  */
 - (void)appendSeperatorLine;
