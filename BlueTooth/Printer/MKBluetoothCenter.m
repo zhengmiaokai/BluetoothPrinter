@@ -1,15 +1,15 @@
 //
-//  MKBluetoothManager.m
+//  MKBluetoothCenter.m
 //  BlueTooth
 //
 //  Created by mikazheng on 2021/10/28.
 //
 
-#import "MKBluetoothManager.h"
+#import "MKBluetoothCenter.h"
 
-@interface MKBluetoothManager () <CBCentralManagerDelegate, CBPeripheralDelegate>
+@interface MKBluetoothCenter () <CBCentralManagerDelegate, CBPeripheralDelegate>
 
-@property (nonatomic, weak) id <MKBluetoothManagerDelegate> delegate;
+@property (nonatomic, weak) id <MKBluetoothCenterDelegate> delegate;
 
 @property (nonatomic, strong) CBCentralManager*  cbCentralMgr;
 @property (nonatomic, strong) CBPeripheral*      cbPeripheral;
@@ -28,10 +28,10 @@
 
 @end
 
-@implementation MKBluetoothManager
+@implementation MKBluetoothCenter
 
-+ (MKBluetoothManager *)sharedInstance {
-    static MKBluetoothManager* bluetoothMgr = nil;
++ (MKBluetoothCenter *)sharedInstance {
+    static MKBluetoothCenter* bluetoothMgr = nil;
     static dispatch_once_t once;
     dispatch_once(&once, ^{
         bluetoothMgr = [[self alloc] init];
@@ -39,7 +39,7 @@
     return bluetoothMgr;
 }
 
-- (void)initializeConfigWithDelegate:(id <MKBluetoothManagerDelegate>)delegate {
+- (void)initializeConfigWithDelegate:(id <MKBluetoothCenterDelegate>)delegate {
     self.delegate = delegate;
     
     /* 蓝牙没打开时，alert弹窗提示 */

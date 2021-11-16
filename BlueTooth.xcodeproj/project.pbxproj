@@ -15,7 +15,7 @@
 		D5522EFA272A54C100BBE1E4 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D5522EF9272A54C100BBE1E4 /* Assets.xcassets */; };
 		D5522EFD272A54C100BBE1E4 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D5522EFB272A54C100BBE1E4 /* LaunchScreen.storyboard */; };
 		D5522F00272A54C100BBE1E4 /* main.m in Sources */ = {isa = PBXBuildFile; fileRef = D5522EFF272A54C100BBE1E4 /* main.m */; };
-		D5522F09272A670400BBE1E4 /* MKBluetoothManager.m in Sources */ = {isa = PBXBuildFile; fileRef = D5522F08272A670400BBE1E4 /* MKBluetoothManager.m */; };
+		D5522F09272A670400BBE1E4 /* MKBluetoothCenter.m in Sources */ = {isa = PBXBuildFile; fileRef = D5522F08272A670400BBE1E4 /* MKBluetoothCenter.m */; };
 		D5522F11272A91E900BBE1E4 /* HLPrinter.m in Sources */ = {isa = PBXBuildFile; fileRef = D5522F0B272A91E900BBE1E4 /* HLPrinter.m */; };
 		D5522F12272A91E900BBE1E4 /* UIWebView+UIImage.m in Sources */ = {isa = PBXBuildFile; fileRef = D5522F0C272A91E900BBE1E4 /* UIWebView+UIImage.m */; };
 		D5522F13272A91E900BBE1E4 /* UIImage+Bitmap.m in Sources */ = {isa = PBXBuildFile; fileRef = D5522F0F272A91E900BBE1E4 /* UIImage+Bitmap.m */; };
@@ -36,8 +36,8 @@
 		D5522EFC272A54C100BBE1E4 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		D5522EFE272A54C100BBE1E4 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		D5522EFF272A54C100BBE1E4 /* main.m */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.objc; path = main.m; sourceTree = "<group>"; };
-		D5522F07272A670400BBE1E4 /* MKBluetoothManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKBluetoothManager.h; sourceTree = "<group>"; };
-		D5522F08272A670400BBE1E4 /* MKBluetoothManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKBluetoothManager.m; sourceTree = "<group>"; };
+		D5522F07272A670400BBE1E4 /* MKBluetoothCenter.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = MKBluetoothCenter.h; sourceTree = "<group>"; };
+		D5522F08272A670400BBE1E4 /* MKBluetoothCenter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = MKBluetoothCenter.m; sourceTree = "<group>"; };
 		D5522F0B272A91E900BBE1E4 /* HLPrinter.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = HLPrinter.m; sourceTree = "<group>"; };
 		D5522F0C272A91E900BBE1E4 /* UIWebView+UIImage.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = "UIWebView+UIImage.m"; sourceTree = "<group>"; };
 		D5522F0D272A91E900BBE1E4 /* UIImage+Bitmap.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = "UIImage+Bitmap.h"; sourceTree = "<group>"; };
@@ -98,8 +98,8 @@
 			children = (
 				95D126E027317DF500C9EE06 /* MKBlueToothPrinter.h */,
 				95D126E127317DF500C9EE06 /* MKBlueToothPrinter.m */,
-				D5522F07272A670400BBE1E4 /* MKBluetoothManager.h */,
-				D5522F08272A670400BBE1E4 /* MKBluetoothManager.m */,
+				D5522F07272A670400BBE1E4 /* MKBluetoothCenter.h */,
+				D5522F08272A670400BBE1E4 /* MKBluetoothCenter.m */,
 			);
 			path = Printer;
 			sourceTree = "<group>";
@@ -194,7 +194,7 @@
 				95D126E227317DF500C9EE06 /* MKBlueToothPrinter.m in Sources */,
 				D5522EF2272A54B600BBE1E4 /* SceneDelegate.m in Sources */,
 				D5522F12272A91E900BBE1E4 /* UIWebView+UIImage.m in Sources */,
-				D5522F09272A670400BBE1E4 /* MKBluetoothManager.m in Sources */,
+				D5522F09272A670400BBE1E4 /* MKBluetoothCenter.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

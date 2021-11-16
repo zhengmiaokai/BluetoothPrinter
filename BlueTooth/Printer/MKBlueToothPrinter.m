@@ -6,7 +6,7 @@
 //
 
 #import "MKBlueToothPrinter.h"
-#import "MKBluetoothManager.h"
+#import "MKBluetoothCenter.h"
 
 /// 蓝牙打印机通用服务
 #define kServiceUUID1         [CBUUID UUIDWithString:@"49535343-FE7D-4AE5-8FA9-9FAFD205E455"]
@@ -14,7 +14,7 @@
 
 #define kBTPeripheralIdentify @"BTPeripheralIdentify"
 
-@interface MKBlueToothPrinter () <MKBluetoothManagerDelegate> {
+@interface MKBlueToothPrinter () <MKBluetoothCenterDelegate> {
     BOOL _isManualDisconnect; // 手动断开
 }
 
@@ -52,7 +52,7 @@
         self.scanBlocks = [NSMutableDictionary dictionary];
         self.connectBlocks = [NSMutableDictionary dictionary];
         
-        [[MKBluetoothManager sharedInstance] initializeConfigWithDelegate:self];
+        [[MKBluetoothCenter sharedInstance] initializeConfigWithDelegate:self];
     }
     return self;
 }
@@ -84,18 +84,26 @@
 }
 
 - (void)scanForPeripherals {
-    [[MKBluetoothManager sharedInstance] scanForPeripheralsWithServices:@[kServiceUUID1, kServiceUUID2] stopScanAfterConnected:NO];
+    [[MKBluetoothCenter sharedInstance] scanForPeripheralsWithServices:@[kServiceUUID1, kServiceUUID2] stopScanAfterConnected:NO];
+}
+
+- (BOOL)isConnected {
+    return [[MKBluetoothCenter sharedInstance] isConnected];
+}
+
+- (NSArray <CBPeripheral*>*)discoverPeripherals {
+    return [[MKBluetoothCenter sharedInstance].discoverPeripherals copy];
 }
 
 - (void)connectPeripheral:(CBPeripheral*)peripheral {
-    if ([[MKBluetoothManager sharedInstance] isConnected]) {
+    if ([[MKBluetoothCenter sharedInstance] isConnected]) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:kBTPeripheralIdentify];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
-        [[MKBluetoothManager sharedInstance] disconnect];
+        [[MKBluetoothCenter sharedInstance] disconnect];
         _isManualDisconnect = YES;
     } else {
-        [[MKBluetoothManager sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
+        [[MKBluetoothCenter sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
         _isManualDisconnect = NO;
         
         [[_connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
@@ -122,17 +130,17 @@
     } else {
         self.printCallBack = printCallBack;
         /// 已连接
-        if ([[MKBluetoothManager sharedInstance] isConnected]) {
-             [[MKBluetoothManager sharedInstance] writeData:data];
+        if ([[MKBluetoothCenter sharedInstance] isConnected]) {
+             [[MKBluetoothCenter sharedInstance] writeData:data];
         } else {
             self.data = data;
             
             __block BOOL isExist = NO;
-            [[MKBluetoothManager sharedInstance].discoverPeripherals enumerateObjectsUsingBlock:^(CBPeripheral*  _Nonnull peripheral, NSUInteger index, BOOL * _Nonnull stop) {
+            [[MKBluetoothCenter sharedInstance].discoverPeripherals enumerateObjectsUsingBlock:^(CBPeripheral*  _Nonnull peripheral, NSUInteger index, BOOL * _Nonnull stop) {
                 /// 已扫描列表已包含记录的设备
                 if ([peripheral.identifier.UUIDString isEqualToString:UUIDString]) {
                     isExist = YES;
-                    [[MKBluetoothManager sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
+                    [[MKBluetoothCenter sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
                     *stop = YES;
                 }
             }];
@@ -168,7 +176,7 @@
             }
             
             /// 取消当前连接
-            [[MKBluetoothManager sharedInstance] disconnect];
+            [[MKBluetoothCenter sharedInstance] disconnect];
         }
     }];
 }
@@ -192,12 +200,12 @@
     NSString* UUIDString = [[NSUserDefaults standardUserDefaults] stringForKey:kBTPeripheralIdentify];
     if (_isAutoConnect && (UUIDString.length > 0)) {
         if ([peripheral.identifier.UUIDString isEqualToString:UUIDString]) {
-            [[MKBluetoothManager sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
+            [[MKBluetoothCenter sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
         }
     }
     
     [[_scanBlocks allValues] enumerateObjectsUsingBlock:^(MKScanCallBack  _Nonnull scanCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
-        scanCallBack(peripheral, [[MKBluetoothManager sharedInstance].discoverPeripherals copy]);
+        scanCallBack(peripheral, [[MKBluetoothCenter sharedInstance].discoverPeripherals copy]);
     }];
 }
 
@@ -221,14 +229,14 @@
     
     /// 非主动断开，且设置了自动重连，触发重连逻辑
     if (!_isManualDisconnect && _isReConnect) {
-        [[MKBluetoothManager sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
+        [[MKBluetoothCenter sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
     }
     [self destroyConnectTimer];
 }
 
 - (void)discoverCharacterWriter:(CBCharacteristic *)characteristic {
     if (self.data) {
-        [[MKBluetoothManager sharedInstance] writeData:self.data];
+        [[MKBluetoothCenter sharedInstance] writeData:self.data];
         self.data = nil;
     }
 }

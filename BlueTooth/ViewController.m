@@ -13,7 +13,6 @@
 
 @property (nonatomic, strong) UITableView* tableView;
 
-@property (nonatomic, strong) CBPeripheral* peripheral;
 @property (nonatomic, copy) NSArray* peripherals;
 
 @end
@@ -37,7 +36,6 @@
     [[MKBlueToothPrinter sharedInstance] addConnectCallBack:^(CBPeripheral *peripheral, MKBTConnectErrorType connectErrorType) {
         if (connectErrorType == MKBTConnectErrorTypeNone) {
             __strong typeof(weakSelf) strongSelf = weakSelf;
-            strongSelf.peripheral = peripheral;
             [strongSelf.tableView reloadData];
         } else if (connectErrorType == MKBTConnectErrorTypeTimeOut) {
             NSLog(@"蓝牙链接超时");
@@ -46,7 +44,14 @@
         }
     } forKey:key];
     
-    [[MKBlueToothPrinter sharedInstance] scanForPeripherals];
+    if ([[MKBlueToothPrinter sharedInstance] isConnected]) {
+        // 重新进入页面的情况
+        self.peripherals = [[MKBlueToothPrinter sharedInstance] discoverPeripherals];
+        [self.tableView reloadData];
+    } else {
+        // 重新扫描手动、自动连接
+        [[MKBlueToothPrinter sharedInstance] scanForPeripherals];
+    }
 }
 
 - (UITableView *)tableView {
@@ -135,19 +140,16 @@
     
     cell.textLabel.text = cbPeripheral.name;
     
-    if ([self.peripheral isEqual:cbPeripheral]) {
-        if (self.peripheral.state == CBPeripheralStateConnected) {
-            cell.detailTextLabel.text = @"已连接";
-        } else if (self.peripheral.state == CBPeripheralStateConnecting) {
-            cell.detailTextLabel.text = @"链接中";
-        } else if (self.peripheral.state == CBPeripheralStateDisconnecting) {
-            cell.detailTextLabel.text = @"断开中";
-        } else {
-            cell.detailTextLabel.text = nil;
-        }
+    if (cbPeripheral.state == CBPeripheralStateConnected) {
+        cell.detailTextLabel.text = @"已连接";
+    } else if (cbPeripheral.state == CBPeripheralStateConnecting) {
+        cell.detailTextLabel.text = @"链接中";
+    } else if (cbPeripheral.state == CBPeripheralStateDisconnecting) {
+        cell.detailTextLabel.text = @"断开中";
     } else {
         cell.detailTextLabel.text = nil;
     }
+    
     return cell;
 }
 

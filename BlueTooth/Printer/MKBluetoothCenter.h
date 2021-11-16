@@ -1,5 +1,5 @@
 //
-//  MKBluetoothManager.h
+//  MKBluetoothCenter.h
 //  BlueTooth
 //
 //  Created by mikazheng on 2021/10/28.
@@ -13,7 +13,7 @@ typedef NS_ENUM(NSInteger, BTReceiveSource) {
     BTReceiveSourceNotify     = 2,  /// 订阅
 };
 
-@protocol MKBluetoothManagerDelegate <NSObject>
+@protocol MKBluetoothCenterDelegate <NSObject>
 
 @optional
 
@@ -39,13 +39,13 @@ typedef NS_ENUM(NSInteger, BTReceiveSource) {
 @end
 
 
-@interface MKBluetoothManager : NSObject
+@interface MKBluetoothCenter : NSObject
 
 @property (nonatomic, strong) NSMutableArray *discoverPeripherals; // 发现周边设备
 
-+ (MKBluetoothManager*)sharedInstance;
++ (MKBluetoothCenter*)sharedInstance;
 
-- (void)initializeConfigWithDelegate:(id <MKBluetoothManagerDelegate>)delegate;
+- (void)initializeConfigWithDelegate:(id <MKBluetoothCenterDelegate>)delegate;
 
 /* 扫瞄设备（stopScanAfterConnected: 外围蓝牙设备连接后停止扫描）*/
 - (void)scanForPeripheralsWithServices:(NSArray *)serviceUUIDs stopScanAfterConnected:(BOOL)stopScanAfterConnected;
