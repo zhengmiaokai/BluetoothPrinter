@@ -51,6 +51,8 @@
         
         self.scanBlocks = [NSMutableDictionary dictionary];
         self.connectBlocks = [NSMutableDictionary dictionary];
+        
+        [[MKBluetoothManager sharedInstance] initializeConfigWithDelegate:self];
     }
     return self;
 }
@@ -81,8 +83,8 @@
     }
 }
 
-- (void)initializeBlueTooth {
-    [[MKBluetoothManager sharedInstance] initializeConfigWithDelegate:self];
+- (void)scanForPeripherals {
+    [[MKBluetoothManager sharedInstance] scanForPeripheralsWithServices:@[kServiceUUID1, kServiceUUID2] stopScanAfterConnected:NO];
 }
 
 - (void)connectPeripheral:(CBPeripheral*)peripheral {
@@ -137,7 +139,7 @@
             
             /// 已扫描列表未包含记录的设备，重新扫描
             if (!isExist) {
-                [[MKBluetoothManager sharedInstance] scanForPeripheralsWithServices:@[kServiceUUID1, kServiceUUID2] stopScanAfterConnected:NO];
+                [self scanForPeripherals];
             }
             /// 处理连接超时
             [self createConnectTimer];
@@ -182,7 +184,7 @@
 #pragma mark - BluetoothMessageDelegate -
 - (void)centralManagerDidUpdateState:(BOOL)isAvailable message:(NSString *)message getStatus:(CBManagerState)state {
     if (isAvailable) {
-        [[MKBluetoothManager sharedInstance] scanForPeripheralsWithServices:@[kServiceUUID1, kServiceUUID2] stopScanAfterConnected:NO];
+        [self scanForPeripherals];
     }
 }
 

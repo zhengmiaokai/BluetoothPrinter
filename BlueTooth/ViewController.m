@@ -45,6 +45,8 @@
             NSLog(@"蓝牙未配置");
         }
     } forKey:key];
+    
+    [[MKBlueToothPrinter sharedInstance] scanForPeripherals];
 }
 
 - (UITableView *)tableView {

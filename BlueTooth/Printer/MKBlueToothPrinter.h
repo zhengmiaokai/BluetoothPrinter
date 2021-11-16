@@ -38,8 +38,8 @@ typedef void(^MKConnectCallBack)(CBPeripheral* peripheral, MKBTConnectErrorType 
 - (void)addConnectCallBack:(MKConnectCallBack)connectCallBack forKey:(NSString *)key;
 - (void)removeConnectCallBackForKey:(NSString *)key;
 
-/// 初始化蓝牙中心配置
-- (void)initializeBlueTooth;
+/// 扫描外围设备
+- (void)scanForPeripherals;
 
 /// 连接外围蓝牙设备
 - (void)connectPeripheral:(CBPeripheral*)periphera;
