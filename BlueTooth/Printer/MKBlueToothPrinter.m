@@ -95,23 +95,27 @@
     return [[MKBluetoothCenter sharedInstance].discoverPeripherals copy];
 }
 
-- (void)connectPeripheral:(CBPeripheral*)peripheral {
+- (void)disconnectPeripheral {
     if ([[MKBluetoothCenter sharedInstance] isConnected]) {
         [[NSUserDefaults standardUserDefaults] removeObjectForKey:kBTPeripheralIdentify];
         [[NSUserDefaults standardUserDefaults] synchronize];
         
         [[MKBluetoothCenter sharedInstance] disconnect];
         _isManualDisconnect = YES;
-    } else {
-        [[MKBluetoothCenter sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
-        _isManualDisconnect = NO;
-        
-        [[_connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
-            connectCallBack(peripheral, NO);
-        }];
-        /// 处理连接超时
-        [self createConnectTimer];
     }
+}
+
+- (void)connectPeripheral:(CBPeripheral*)peripheral {
+    [self disconnectPeripheral];
+    
+    [[MKBluetoothCenter sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
+    _isManualDisconnect = NO;
+    
+    [[_connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
+         connectCallBack(peripheral, NO);
+    }];
+    /// 处理连接超时
+    [self createConnectTimer];
 }
 
 - (void)printOrderWithData:(NSData *)data printCallBack:(void (^)(BOOL success, MKBTConnectErrorType connectErrorType))printCallBack {
