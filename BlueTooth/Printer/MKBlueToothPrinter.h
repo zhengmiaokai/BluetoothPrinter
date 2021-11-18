@@ -47,6 +47,9 @@ typedef void(^MKConnectCallBack)(CBPeripheral* peripheral, MKBTConnectErrorType 
 /// 获取已发现的外围设备列表
 - (NSArray <CBPeripheral*>*)discoverPeripherals;
 
+/// 断开当前已连接的蓝牙设备
+- (void)disconnectPeripheral;
+
 /// 连接外围蓝牙设备
 - (void)connectPeripheral:(CBPeripheral*)periphera;
 
