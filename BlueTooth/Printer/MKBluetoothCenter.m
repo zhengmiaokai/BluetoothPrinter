@@ -146,7 +146,7 @@
         }
         
         if (_delegate && [_delegate respondsToSelector:@selector(writeResult:characteristic:)]) {
-            [_delegate writeResult:NO descriptor:nil];
+            [_delegate writeResult:NO characteristic:nil];
         }
     } else {
         /* iOS9之后提供了查询蓝牙写入最大长度，经过真机测试(iphone5s/iphone7)，data长度超过maxLength也可以正常写入
