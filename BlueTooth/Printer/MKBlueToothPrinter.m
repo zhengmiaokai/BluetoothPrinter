@@ -112,7 +112,7 @@
     _isManualDisconnect = NO;
     
     [[_connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
-         connectCallBack(peripheral, NO);
+         connectCallBack(peripheral, MKBTConnectErrorTypeNone);
     }];
     /// 处理连接超时
     [self createConnectTimer];
@@ -205,6 +205,12 @@
     if (_isAutoConnect && (UUIDString.length > 0)) {
         if ([peripheral.identifier.UUIDString isEqualToString:UUIDString]) {
             [[MKBluetoothCenter sharedInstance] connectPeripheral:peripheral serviceUUIDs:nil characteristicUUIDs:nil];
+            
+            [[_connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
+                connectCallBack(peripheral, MKBTConnectErrorTypeNone);
+            }];
+            /// 处理连接超时
+            [self createConnectTimer];
         }
     }
     
@@ -220,7 +226,7 @@
     }
     
     [[_connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
-        connectCallBack(peripheral, NO);
+        connectCallBack(peripheral, MKBTConnectErrorTypeNone);
     }];
     
     [self destroyConnectTimer];
