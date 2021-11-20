@@ -26,6 +26,9 @@
 
 @property (nonatomic, assign) BOOL stopScanAfterConnected;
 
+@property (nonatomic, assign) NSInteger writeCount;
+@property (nonatomic, assign) NSInteger didWriteCount;
+
 @end
 
 @implementation MKBluetoothCenter
@@ -149,13 +152,31 @@
             [_delegate writeResult:NO characteristic:nil];
         }
     } else {
-        /* iOS9之后提供了查询蓝牙写入最大长度，经过真机测试(iphone5s/iphone7)，data长度超过maxLength也可以正常写入
-        if ([_cbPeripheral respondsToSelector:@selector(maximumWriteValueLengthForType:)]) {
-            NSInteger maxLength = [_cbPeripheral maximumWriteValueLengthForType:CBCharacteristicWriteWithResponse];
-        }
-         */
+        _writeCount = 0;
+        _didWriteCount = 0;
         
-        [self.cbPeripheral writeValue:data forCharacteristic:characteristic type:type];
+        /* iOS9之后提供了查询蓝牙写入最大长度，目前测试的蓝牙设备，data长度超过maxLength也可以正常输出 */
+        NSInteger maxLength = [_cbPeripheral maximumWriteValueLengthForType:CBCharacteristicWriteWithResponse];
+        
+        /// 防止个别设备出现传输异常，数据大于maxLength时使用分节传输
+        if ((maxLength <= 0) || (maxLength >= data.length)) {
+            [self.cbPeripheral writeValue:data forCharacteristic:characteristic type:type];
+            _writeCount++;
+        } else {
+            NSInteger location = 0;
+            /// 先取出maxLength大小的subData逐个写入
+            for (location = 0; location < data.length - maxLength; location += maxLength) {
+                NSData *subData = [data subdataWithRange:NSMakeRange(location, maxLength)];
+                [_cbPeripheral writeValue:subData forCharacteristic:characteristic type:type];
+                _writeCount++;
+            }
+            /// 再取出小于maxLength的lastData写入
+            NSData *lastData = [data subdataWithRange:NSMakeRange(location, data.length - location)];
+            if (lastData) {
+                [_cbPeripheral writeValue:lastData forCharacteristic:characteristic type:type];
+                _writeCount++;
+            }
+        }
     }
 }
 
@@ -301,8 +322,12 @@
 
  /// 向蓝牙发送数据后的回调（Characteristic）
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
-    if (_delegate && [_delegate respondsToSelector:@selector(writeResult:characteristic:)]) {
-        [_delegate writeResult:!error characteristic:characteristic];
+    
+    _didWriteCount++;
+    if (_writeCount == _didWriteCount) {
+        if (_delegate && [_delegate respondsToSelector:@selector(writeResult:characteristic:)]) {
+            [_delegate writeResult:!error characteristic:characteristic];
+        }
     }
     
     if (!error) {
