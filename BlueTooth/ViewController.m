@@ -19,6 +19,12 @@
 
 @implementation ViewController
 
+- (void)dealloc {
+    NSString* key = [NSString stringWithFormat:@"to%@",NSStringFromClass(self.class)];
+    [[MKBlueToothPrinter sharedInstance] removeScanCallBackForKey:key];
+    [[MKBlueToothPrinter sharedInstance] removeConnectCallBackForKey:key];
+}
+
 - (void)viewDidLoad {
     [super viewDidLoad];
     // Do any additional setup after loading the view.
