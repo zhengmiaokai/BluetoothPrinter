@@ -322,18 +322,17 @@
 
  /// 向蓝牙发送数据后的回调（Characteristic）
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForCharacteristic:(CBCharacteristic *)characteristic error:(NSError *)error {
+    if (!error) {
+         NSLog(@"DidWriteValueForCharacteristic");
+    } else{
+        NSLog(@"DidWriteValueForCharacteristicFail: %@", [error description]);
+    }
     
     _didWriteCount++;
     if (_writeCount == _didWriteCount) {
         if (_delegate && [_delegate respondsToSelector:@selector(writeResult:characteristic:)]) {
             [_delegate writeResult:!error characteristic:characteristic];
         }
-    }
-    
-    if (!error) {
-         NSLog(@"DidWriteValueForCharacteristic");
-    } else{
-        NSLog(@"DidWriteValueForCharacteristicFail: %@", [error description]);
     }
 }
 
@@ -379,14 +378,14 @@
 
 /// 向蓝牙发送数据后的回调（Descriptor）
 - (void)peripheral:(CBPeripheral *)peripheral didWriteValueForDescriptor:(CBDescriptor *)descriptor error:(nullable NSError *)error {
-    if (_delegate && [_delegate respondsToSelector:@selector(writeResult:descriptor:)]) {
-        [_delegate writeResult:!error descriptor:descriptor];
-    }
-    
     if (!error) {
          NSLog(@"DidWriteValueForDescriptor");
     } else {
         NSLog(@"DidWriteValueForDescriptorFail: %@", [error description]);
+    }
+    
+    if (_delegate && [_delegate respondsToSelector:@selector(writeResult:descriptor:)]) {
+        [_delegate writeResult:!error descriptor:descriptor];
     }
 }
 

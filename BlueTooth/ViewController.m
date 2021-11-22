@@ -15,6 +15,9 @@
 
 @property (nonatomic, copy) NSArray* peripherals;
 
+@property (nonatomic, strong) dispatch_queue_t serialQueue;
+@property (nonatomic, strong) dispatch_semaphore_t semaphore;
+
 @end
 
 @implementation ViewController
@@ -30,6 +33,13 @@
     // Do any additional setup after loading the view.
     [self.view addSubview:self.tableView];
     [self.view addSubview:[self button]];
+    
+    [self createFields];
+}
+
+- (void)createFields {
+    self.semaphore = dispatch_semaphore_create(1);
+    self.serialQueue = dispatch_queue_create("print_serail_queue", NULL);
     
     NSString* key = [NSString stringWithFormat:@"to%@",NSStringFromClass(self.class)];
     __weak typeof(self) weakSelf = self;
@@ -78,12 +88,19 @@
 }
 
 - (void)print:(UIButton *)btn {
-    HLPrinter* printer = [self getPrinter];
-    [[MKBlueToothPrinter sharedInstance] printOrderWithData:[printer getFinalData] printCallBack:^(BOOL success, MKBTConnectErrorType connectErrorType) {
-        if (success) {
-            NSLog(@"订单已经打印！！！");
-        }
-    }];
+    for (int i=0; i<2; i++) {
+        // 异步串行+信号量: 递归调用蓝牙打印机
+        dispatch_async(_serialQueue, ^{
+            HLPrinter* printer = [self getPrinter];
+            dispatch_semaphore_wait(self.semaphore, DISPATCH_TIME_FOREVER);
+            [[MKBlueToothPrinter sharedInstance] printOrderWithData:[printer getFinalData] printCallBack:^(BOOL success, MKBTConnectErrorType connectErrorType) {
+                if (success) {
+                    NSLog(@"订单已经打印！！！");
+                }
+                dispatch_semaphore_signal(self.semaphore);
+            }];
+        });
+    }
 }
 
 - (HLPrinter *)getPrinter {
@@ -93,38 +110,40 @@
     [printer appendNewLine];
     [printer appendText:@"李记三及第-宝体" alignment:HLTextAlignmentCenter fontSize:HLFontSizeTitleSmalle];
     [printer appendSeperatorLine];
-    
+
+    /* 暂时屏蔽，减少打印纸的使用
     [printer appendText:@"期望送达时间：立即配送" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleSmalle];
     [printer appendText:@"下单时间：2021-11-15 11:27:27" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleSmalle];
     [printer appendSeperatorLine];
-    
+
     [printer appendText:@"备注：少麻少辣，谢谢！！！" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
     [printer appendSeperatorLine];
-    
+
     [printer appendLeftText:@"商品" middleText:@"数量" rightText:@"价格" isTitle:YES];
     [printer appendSeperatorLine];
     [printer appendLeftText:@"三及第汤河粉" middleText:@"1" rightText:@"￥13" isTitle:YES];
     [printer appendSeperatorLine];
-    
+
     [printer appendTitle:@"打包费：" value:@"￥1"];
     [printer appendTitle:@"配送费：" value:@"￥2"];
     [printer appendTitle:@"优惠券：" value:@"-￥3"];
     [printer appendSeperatorLine];
-    
+
     [printer appendText:@"用户实付：￥13" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
     [printer appendSeperatorLine];
-    
+
     [printer appendText:@"广东华南理工" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
     [printer appendText:@"南苑10栋   403" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
     [printer appendText:@"郑先生" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
     [printer appendText:@"158******27" alignment:HLTextAlignmentLeft fontSize:HLFontSizeTitleMiddle];
     [printer appendNewLine];
-    
+
     [printer appendQRCodeWithInfo:@"MD1232423434"];
     [printer appendNewLine];
-    
+
     [printer appendNewLine];
     [printer appendNewLine];
+     */
     
     return printer;
 }
