@@ -140,7 +140,8 @@
 
     [printer appendQRCodeWithInfo:@"MD1232423434"];
     [printer appendNewLine];
-
+    
+    [printer appendBarCodeWithInfo:@"1232423434"];
     [printer appendNewLine];
     [printer appendNewLine];
      */
