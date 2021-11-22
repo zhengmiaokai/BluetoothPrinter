@@ -182,7 +182,11 @@
     [tableView deselectRowAtIndexPath:indexPath animated:YES];
     
     CBPeripheral* cbPeripheral = [self.peripherals objectAtIndex:indexPath.row];
-    [[MKBlueToothPrinter sharedInstance] connectPeripheral:cbPeripheral];
+    if (cbPeripheral.state == CBPeripheralStateConnected) {
+        [[MKBlueToothPrinter sharedInstance] disconnectPeripheral];
+    } else {
+        [[MKBlueToothPrinter sharedInstance] connectPeripheral:cbPeripheral];
+    }
 }
 
 @end
