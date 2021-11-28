@@ -24,6 +24,7 @@
 
 - (void)dealloc {
     NSString* key = [NSString stringWithFormat:@"to%@",NSStringFromClass(self.class)];
+    [[MKBlueToothPrinter sharedInstance] removeCentralStateCallBackForKey:key];
     [[MKBlueToothPrinter sharedInstance] removeScanCallBackForKey:key];
     [[MKBlueToothPrinter sharedInstance] removeConnectCallBackForKey:key];
 }
@@ -43,6 +44,14 @@
     
     NSString* key = [NSString stringWithFormat:@"to%@",NSStringFromClass(self.class)];
     __weak typeof(self) weakSelf = self;
+    [[MKBlueToothPrinter sharedInstance] addCentralStateCallBack:^(CBManagerState state) {
+        if (state == CBManagerStateUnsupported) {
+            NSLog(@"不支持蓝牙功能");
+        } else if (state == CBManagerStateUnauthorized) {
+            NSLog(@"蓝牙服务未开启");
+        }
+    } forKey:key];
+    
     [[MKBlueToothPrinter sharedInstance] addScanCallBack:^(CBPeripheral *peripheral, NSArray *peripherals) {
         __strong typeof(weakSelf) strongSelf = weakSelf;
         strongSelf.peripherals = peripherals;
