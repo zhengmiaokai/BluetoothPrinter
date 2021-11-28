@@ -27,6 +27,7 @@
 
 @property (nonatomic, strong) NSMutableDictionary* scanBlocks;
 @property (nonatomic, strong) NSMutableDictionary* connectBlocks;
+@property (nonatomic, strong) NSMutableDictionary* centralStateBlocks;
 
 @end
 
@@ -51,10 +52,24 @@
         
         self.scanBlocks = [NSMutableDictionary dictionary];
         self.connectBlocks = [NSMutableDictionary dictionary];
+        self.centralStateBlocks = [NSMutableDictionary dictionary];
         
         [[MKBluetoothCenter sharedInstance] initializeConfigWithDelegate:self];
     }
     return self;
+}
+
+/// 蓝牙中心状态回调
+- (void)addCentralStateCallBack:(MKCentralStateCallBack)centralStateCallBack forKey:(NSString *)key {
+    if (centralStateCallBack && key) {
+        [_centralStateBlocks setObject:[centralStateCallBack copy] forKey:key];
+    }
+}
+
+- (void)removeCentralStateCallBackForKey:(NSString *)key {
+    if (key) {
+        [_centralStateBlocks removeObjectForKey:key];
+    }
 }
 
 /// 扫描到外围设备
@@ -91,6 +106,10 @@
     return [[MKBluetoothCenter sharedInstance] isConnected];
 }
 
+- (BOOL)isConnectedWithIdentify:(NSString *)identify {
+    return [[LCBluetoothCenter sharedInstance] isConnectedWithIdentify:identify];
+}
+
 - (NSArray <CBPeripheral*>*)discoverPeripherals {
     return [[MKBluetoothCenter sharedInstance].discoverPeripherals copy];
 }
@@ -121,16 +140,17 @@
 - (void)printOrderWithData:(NSData *)data printCallBack:(void (^)(BOOL success, MKBTConnectErrorType connectErrorType))printCallBack {
     NSString* UUIDString = [[NSUserDefaults standardUserDefaults] stringForKey:kBTPeripheralIdentify];
     if (UUIDString.length == 0) {
-        NSLog(@"未配置打印机");
         /// 未配置蓝牙回调
-        [[self.connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
-            connectCallBack(nil, MKBTConnectErrorTypeNoConfig);
-        }];
+        dispatch_async(dispatch_get_main_queue(), ^{
+            [[self.connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
+                connectCallBack(nil, MKBTConnectErrorTypeNoConfig);
+            }];
         
-        /// 打印回调
-        if (printCallBack) {
-            printCallBack(NO, MKBTConnectErrorTypeNoConfig);
-        }
+            /// 打印回调
+            if (printCallBack) {
+                printCallBack(NO, MKBTConnectErrorTypeNoConfig);
+            }
+        });
     } else {
         self.printCallBack = printCallBack;
         /// 已连接
@@ -160,29 +180,33 @@
 }
 
 - (void)createConnectTimer {
-    __weak typeof(self) wSelf = self;
-    self.connectTimer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
-        __strong typeof(wSelf) sSelf = wSelf;
-        sSelf.connectInterval ++;
-        if (sSelf.timeout && (sSelf.connectInterval >= sSelf.timeout)) {
-            [sSelf destroyConnectTimer];
-            sSelf.data = nil;
-            
-            /// 连接超时回调
-            [[sSelf.connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
-                connectCallBack(nil, MKBTConnectErrorTypeTimeOut);
-            }];
-            
-            /// 打印回调
-            if (sSelf.printCallBack) {
-                sSelf.printCallBack(NO, MKBTConnectErrorTypeTimeOut);
-                sSelf.printCallBack = nil;
-            }
+    dispatch_async(dispatch_get_main_queue(), ^{
+        [self destroyConnectTimer];
+        
+         __weak typeof(self) wSelf = self;
+        self.connectTimer = [NSTimer scheduledTimerWithTimeInterval:1 repeats:YES block:^(NSTimer * _Nonnull timer) {
+            __strong typeof(wSelf) sSelf = wSelf;
+            sSelf.connectInterval ++;
+            if (sSelf.timeout && (sSelf.connectInterval >= sSelf.timeout)) {
+                [sSelf destroyConnectTimer];
+                sSelf.data = nil;
+                
+                /// 连接超时回调
+                [[sSelf.connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
+                    connectCallBack(nil, MKBTConnectErrorTypeTimeOut);
+                }];
+                
+                /// 打印回调
+                if (sSelf.printCallBack) {
+                    sSelf.printCallBack(NO, MKBTConnectErrorTypeTimeOut);
+                    sSelf.printCallBack = nil;
+                }
             
             /// 取消当前连接
             [[MKBluetoothCenter sharedInstance] disconnect];
         }
     }];
+    });
 }
 
 - (void)destroyConnectTimer {
@@ -198,6 +222,10 @@
     if (isAvailable) {
         [self scanForPeripherals];
     }
+    
+    [[_centralStateBlocks allValues] enumerateObjectsUsingBlock:^(MKCentralStateCallBack  _Nonnull centralStateCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
+        centralStateCallBack(state);
+    }];
 }
 
 - (void)discoverPeripheral:(CBPeripheral *)peripheral {
