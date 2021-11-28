@@ -53,7 +53,10 @@ typedef NS_ENUM(NSInteger, BTReceiveSource) {
 
 - (void)connectPeripheral:(CBPeripheral*)peripheral serviceUUIDs:(NSArray *)serviceUUIDs characteristicUUIDs:(NSArray *)characteristicUUIDs; // 连接外围设备
 - (void)disconnect; // 断开
-- (BOOL)isConnected; // 是否断开
+
+/* 是否断开 */
+- (BOOL)isConnected;
+- (BOOL)isConnectedWithIdentify:(NSString *)identify;
 
 #pragma mark - 蓝牙打印 -
 - (void)writeData:(NSData *)data; // 写入数据
