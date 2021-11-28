@@ -127,6 +127,14 @@
     return (self.cbPeripheral.state == CBPeripheralStateConnected ? YES : NO);
 }
 
+- (BOOL)isConnectedWithIdentify:(NSString *)identify {
+    if ([[self.cbPeripheral.identifier UUIDString] isEqualToString:identify]) {
+        return (self.cbPeripheral.state == CBPeripheralStateConnected ? YES : NO);
+    } else {
+        return NO;
+    }
+}
+
 #pragma mark - 蓝牙打印 -
 - (void)writeData:(NSData *)data {
     [self writeValue:data forCharacteristic:self.cbCharacterWriter type:CBCharacteristicWriteWithResponse];
