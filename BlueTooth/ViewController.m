@@ -48,7 +48,9 @@
         if (state == CBManagerStateUnsupported) {
             NSLog(@"不支持蓝牙功能");
         } else if (state == CBManagerStateUnauthorized) {
-            NSLog(@"蓝牙服务未开启");
+            NSLog(@"应用蓝牙服务未打开，请到设置页开启");
+        } else if (state == CBManagerStatePoweredOff) {
+            NSLog(@"请确认系统蓝牙开关已打开");
         }
     } forKey:key];
     
