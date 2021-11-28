@@ -107,7 +107,7 @@
 }
 
 - (BOOL)isConnectedWithIdentify:(NSString *)identify {
-    return [[LCBluetoothCenter sharedInstance] isConnectedWithIdentify:identify];
+    return [[MKBluetoothCenter sharedInstance] isConnectedWithIdentify:identify];
 }
 
 - (NSArray <CBPeripheral*>*)discoverPeripherals {
