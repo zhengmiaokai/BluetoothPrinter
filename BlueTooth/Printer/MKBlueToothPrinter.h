@@ -16,6 +16,7 @@ typedef NS_ENUM(NSInteger, MKBTConnectErrorType) {
 
 typedef void(^MKScanCallBack)(CBPeripheral* peripheral, NSArray* peripherals);
 typedef void(^MKConnectCallBack)(CBPeripheral* peripheral, MKBTConnectErrorType connectErrorType);
+typedef void(^MKCentralStateCallBack)(CBManagerState state);
 
 @interface MKBlueToothPrinter : NSObject
 
@@ -30,6 +31,10 @@ typedef void(^MKConnectCallBack)(CBPeripheral* peripheral, MKBTConnectErrorType 
 
 + (MKBlueToothPrinter *)sharedInstance;
 
+/// 蓝牙中心状态回调
+- (void)addCentralStateCallBack:(MKCentralStateCallBack)centralStateCallBack forKey:(NSString *)key;
+- (void)removeCentralStateCallBackForKey:(NSString *)key;
+
 /// 扫描到外围设备回调
 - (void)addScanCallBack:(MKScanCallBack)scanCallBack forKey:(NSString *)key;
 - (void)removeScanCallBackForKey:(NSString *)key;
@@ -41,8 +46,9 @@ typedef void(^MKConnectCallBack)(CBPeripheral* peripheral, MKBTConnectErrorType 
 /// 扫描外围设备
 - (void)scanForPeripherals;
 
-/// 是否已连接外围设备
+/* 是否已连接外围设备 */
 - (BOOL)isConnected;
+- (BOOL)isConnectedWithIdentify:(NSString *)identify;
 
 /// 获取已发现的外围设备列表
 - (NSArray <CBPeripheral*>*)discoverPeripherals;
