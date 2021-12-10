@@ -202,10 +202,10 @@
                     sSelf.printCallBack = nil;
                 }
             
-            /// 取消当前连接
-            [[MKBluetoothCenter sharedInstance] disconnect];
-        }
-    }];
+                /// 取消当前连接
+                [[MKBluetoothCenter sharedInstance] disconnect];
+            }
+        }];
     });
 }
 
