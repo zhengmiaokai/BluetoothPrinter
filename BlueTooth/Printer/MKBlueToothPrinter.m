@@ -262,7 +262,7 @@
 
 - (void)disconnectPeripheral:(CBPeripheral *)peripheral {
     [[_connectBlocks allValues] enumerateObjectsUsingBlock:^(MKConnectCallBack  _Nonnull connectCallBack, NSUInteger idx, BOOL * _Nonnull stop) {
-        connectCallBack(peripheral, NO);
+        connectCallBack(peripheral, MKBTConnectErrorTypeNone);
     }];
     
     /// 非主动断开，且设置了自动重连，触发重连逻辑
