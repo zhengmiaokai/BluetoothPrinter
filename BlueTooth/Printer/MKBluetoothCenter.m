@@ -94,6 +94,11 @@
     self.characteristicUUIDs = characteristicUUIDs;
     
     if (peripheral) {
+        if (peripheral.state != CBPeripheralStateDisconnected) {
+            NSLog(@"peripheral is not disconnected state");
+            return;
+        }
+        
         self.cbPeripheral = peripheral;
         self.cbPeripheral.delegate = self;
     } else {
