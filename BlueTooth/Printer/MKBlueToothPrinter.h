@@ -31,6 +31,9 @@ typedef void(^MKCentralStateCallBack)(CBManagerState state);
 
 + (MKBlueToothPrinter *)sharedInstance;
 
+/// 注册蓝牙服务
+- (void)registerBluetoothService;
+
 /// 蓝牙中心状态回调
 - (void)addCentralStateCallBack:(MKCentralStateCallBack)centralStateCallBack forKey:(NSString *)key;
 - (void)removeCentralStateCallBackForKey:(NSString *)key;

@@ -53,10 +53,16 @@
         self.scanBlocks = [NSMutableDictionary dictionary];
         self.connectBlocks = [NSMutableDictionary dictionary];
         self.centralStateBlocks = [NSMutableDictionary dictionary];
-        
-        [[MKBluetoothCenter sharedInstance] initializeConfigWithDelegate:self];
     }
     return self;
+}
+
+// 注册蓝牙服务
+- (void)registerBluetoothService {
+    static dispatch_once_t once;
+    dispatch_once(&once, ^{
+        [[MKBluetoothCenter sharedInstance] initializeConfigWithDelegate:self];
+    });
 }
 
 /// 蓝牙中心状态回调

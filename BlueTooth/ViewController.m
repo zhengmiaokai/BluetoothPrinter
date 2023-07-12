@@ -42,6 +42,8 @@
     self.semaphore = dispatch_semaphore_create(1);
     self.serialQueue = dispatch_queue_create("print_serail_queue", NULL);
     
+    [[MKBlueToothPrinter sharedInstance] registerBluetoothService];
+    
     NSString* key = [NSString stringWithFormat:@"to%@",NSStringFromClass(self.class)];
     __weak typeof(self) weakSelf = self;
     [[MKBlueToothPrinter sharedInstance] addCentralStateCallBack:^(CBManagerState state) {
